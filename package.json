@@ -2,7 +2,7 @@
   "name": "patternon",
   "version": "0.0.1",
   "description": "Find matches to array of patterns",
-  "main": "lib/main.js",
+  "main": "lib/patternon.js",
   "scripts": {
     "test": "make test"
   },
