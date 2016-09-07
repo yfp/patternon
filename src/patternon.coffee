@@ -1,5 +1,10 @@
-regexp_from_string = (str) ->
-  escaped = str.replace /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"
+makeRegexp = (str, wildcard = yes) ->
+  escaped = if wildcard
+    str.replace /[\-\[\]\/\{\}\(\)\+\.\\\^\$\|]/g, "\\$&"
+       .replace /\*/g, '[a-z-A-Z0-9_-]*'
+       .replace /\?/g, '[a-z-A-Z0-9_-]'
+  else
+    str.replace /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"
   RegExp "^#{escaped}$"
 
 class Patternon
@@ -9,13 +14,14 @@ class Patternon
     }
     @rules = []
     for item in array
-      
-      [rule, value] = item
-      newrule = switch
-        when rule instanceof RegExp then rule
-        when typeof(rule) == 'string' then regexp_from_string rule
-        else throw "Unknown pattern type"
-      @rules.push [newrule, value]
+      @addRule item...
+  addRule: (rule, value)->
+    newrule = switch
+      when rule instanceof RegExp then rule
+      when typeof(rule) == 'string'
+        makeRegexp rule, @options.wildcard
+      else throw "Unknown pattern type"
+    @rules.push [newrule, value]
   first: (str) ->
     for item in @rules
       if str.match item[0]
